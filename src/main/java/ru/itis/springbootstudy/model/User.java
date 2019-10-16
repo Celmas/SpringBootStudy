@@ -1,5 +1,6 @@
 package ru.itis.springbootstudy.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -22,14 +23,16 @@ public class User {
 
     @Column(length = 1000)
     private String login;
-    private Integer age;
+    private String email;
+    @JsonIgnore
     private String passwordHash;
 
-    private LocalDateTime birthDateTime;
 
     @Enumerated(value = EnumType.STRING)
+    @JsonIgnore
     private Role role;
 
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     private List<Token> tokens;
 }
