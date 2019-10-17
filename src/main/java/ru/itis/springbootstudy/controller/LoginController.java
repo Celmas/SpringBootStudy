@@ -1,6 +1,7 @@
 package ru.itis.springbootstudy.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +17,7 @@ public class LoginController {
         this.service = service;
     }
 
+    @PreAuthorize("permitAll()")
     @PostMapping("/login")
     public ResponseEntity<TokenDto> login(@RequestBody LoginDto loginData) {
         return ResponseEntity.ok(service.login(loginData));

@@ -16,6 +16,7 @@ import ru.itis.springbootstudy.security.provider.TokenAuthenticationProvider;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @ComponentScan("ru.itis")
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 

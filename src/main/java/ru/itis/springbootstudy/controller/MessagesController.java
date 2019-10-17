@@ -2,6 +2,7 @@ package ru.itis.springbootstudy.controller;
 
 import lombok.SneakyThrows;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.itis.springbootstudy.dto.MessageDto;
 import ru.itis.springbootstudy.model.Message;
@@ -23,6 +24,7 @@ public class MessagesController {
         this.userService = userService;
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/messages")
     public ResponseEntity<Object> receiveMessage(@RequestBody MessageDto messageDto) {
         if (!messages.containsKey(messageDto.getTokenValue())) {
@@ -43,6 +45,7 @@ public class MessagesController {
     }
 
     @SneakyThrows
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/messages")
     public ResponseEntity<List<Message>> getMessagesForPage(@RequestParam("token") String token) {
         synchronized (messages.get(token)) {
