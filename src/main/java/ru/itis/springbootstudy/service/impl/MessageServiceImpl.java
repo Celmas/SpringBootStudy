@@ -3,11 +3,13 @@ package ru.itis.springbootstudy.service.impl;
 import org.springframework.stereotype.Service;
 import ru.itis.springbootstudy.model.Message;
 import ru.itis.springbootstudy.repository.MessageRepository;
+import ru.itis.springbootstudy.service.MessageService;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
-public class MessageServiceImpl implements ru.itis.springbootstudy.service.MessageService {
+public class MessageServiceImpl implements MessageService {
     private MessageRepository messageRepository;
 
     public MessageServiceImpl(MessageRepository messageRepository) {
@@ -17,5 +19,10 @@ public class MessageServiceImpl implements ru.itis.springbootstudy.service.Messa
     @Override
     public Optional<Message> save(Message message) {
         return Optional.of(messageRepository.save(message));
+    }
+
+    @Override
+    public List<Message> getAll() {
+        return messageRepository.findAll();
     }
 }

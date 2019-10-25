@@ -3,6 +3,7 @@ package ru.itis.springbootstudy.controller;
 import lombok.SneakyThrows;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ru.itis.springbootstudy.dto.MessageDto;
 import ru.itis.springbootstudy.model.Message;
@@ -26,17 +27,18 @@ public class MessagesController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/messages")
-    public ResponseEntity<Object> receiveMessage(@RequestBody MessageDto messageDto) {
-        if (!messages.containsKey(messageDto.getTokenValue())) {
-            messages.put(messageDto.getTokenValue(), new ArrayList<>());
+    public ResponseEntity<Object> receiveMessage(@RequestBody MessageDto messageDto, Authentication authentication) {
+        String token = authentication.getName();
+        if (!messages.containsKey(token)) {
+            messages.put(token, new ArrayList<>());
         }
+        Optional<Message> message = messageService.save(Message.builder()
+                .sender(userService.getUserByTokenValue(token).get())
+                .time(LocalDateTime.now())
+                .value(messageDto.getText())
+                .build());
         for (List<Message> pageMessages : messages.values()) {
             synchronized (pageMessages) {
-                Optional<Message> message = messageService.save(Message.builder()
-                        .sender(userService.getUserByTokenValue(messageDto.getTokenValue()).get())
-                        .time(LocalDateTime.now())
-                        .value(messageDto.getText())
-                        .build());
                 pageMessages.add(message.get());
                 pageMessages.notifyAll();
             }
@@ -47,7 +49,8 @@ public class MessagesController {
     @SneakyThrows
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/messages")
-    public ResponseEntity<List<Message>> getMessagesForPage(@RequestParam("token") String token) {
+    public ResponseEntity<List<Message>> getMessagesForPage(Authentication authentication) {
+        String token = authentication.getName();
         synchronized (messages.get(token)) {
             if (messages.get(token).isEmpty()) {
                 messages.get(token).wait();
@@ -56,5 +59,12 @@ public class MessagesController {
             messages.get(token).clear();
             return ResponseEntity.ok(response);
         }
+    }
+
+    @SneakyThrows
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/allmessages")
+    public ResponseEntity<List<Message>> getAllMessagesForPage() {
+        return ResponseEntity.ok(messageService.getAll());
     }
 }

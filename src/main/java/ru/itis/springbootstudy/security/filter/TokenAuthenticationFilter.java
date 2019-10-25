@@ -14,16 +14,16 @@ public class TokenAuthenticationFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
-        Cookie[] cookies = request.getCookies();
-        String tokenValue = null;
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(AUTH_HEADER)) {
-                    tokenValue = cookie.getValue();
-                }
-            }
-        }
-        // String tokenValue = request.getHeader(AUTH_HEADER);
+//        Cookie[] cookies = request.getCookies();
+//        String tokenValue = null;
+//        if (cookies != null) {
+//            for (Cookie cookie : cookies) {
+//                if (cookie.getName().equals(AUTH_HEADER)) {
+//                    tokenValue = cookie.getValue();
+//                }
+//            }
+//        }
+        String tokenValue = request.getHeader(AUTH_HEADER);
         if (tokenValue != null) {
             TokenAuthentication authentication = new TokenAuthentication();
             authentication.setToken(tokenValue);

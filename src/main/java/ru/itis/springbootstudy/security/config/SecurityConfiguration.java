@@ -11,6 +11,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import ru.itis.springbootstudy.security.filter.TokenAuthenticationFilter;
 import ru.itis.springbootstudy.security.provider.TokenAuthenticationProvider;
 
@@ -34,13 +37,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        http.cors();
 
         http
                 .csrf().disable()
                 .sessionManagement().disable()
                 .addFilterBefore(new TokenAuthenticationFilter(), BasicAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers("signin", "/signup", "/register", "/login", "*/js/**", "*/css/**")
+                .antMatchers("/register", "/login", "*/js/**", "*/css/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated();
@@ -49,5 +53,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
+        return source;
     }
 }
